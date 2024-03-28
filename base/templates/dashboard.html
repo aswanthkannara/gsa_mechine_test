@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            margin-top: 20px;
+        }
+        .sidebar {
+            background-color: #f8f9fa;
+            padding: 20px;
+            height: 100%;
+            border-right: 1px solid #dee2e6;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .add-task-form .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .task-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .alert-info {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h4 class="mb-4">User Dashboard</h4>
+                <ul class="nav flex-column mb-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">My Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">My Profile</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-9 col-lg-10 main-content">
+                <h1 class="mb-4">User Dashboard</h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                Add Task
+                            </div>
+                            <div class="card-body add-task-form">
+                                <form id="add-task-form">
+                                    <div class="form-group">
+                                        <label for="task_name">Task Name:</label>
+                                        <input type="text" class="form-control" id="task_name" name="task_name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="task_datetime">Date and Time:</label>
+                                        <input type="datetime-local" class="form-control" id="task_datetime" name="task_datetime" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="task_assignee">Assign Task To:</label>
+                                        <select class="form-control" id="task_assignee" name="task_assignee" required>
+                                            <option value="">Select User</option>
+                                            <option value="1">User 1</option>
+                                            <option value="2">User 2</option>
+                                            <option value="3">User 3</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add Task</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        All Tasks
+                    </div>
+                    <div class="card-body task-list">
+                        <table class="table" id="task-table">
+                            <thead>
+                                <tr>
+                                    <th>Task Name</th>
+                                    <th>Date and Time</th>
+                                    <th>Assigned to</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            
+            $('#add-task-form').submit(function(e) {
+                e.preventDefault(); 
+
+                var formData = $(this).serialize(); 
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/add_task/',
+                    data: {
+                        'task_name':$('#task_name').val(),
+                        'task_datetime':$('#task_datetime').val(),
+                        'task_assignee':$('#task_assignee').val(),
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        var newTask = response.task;
+                        // var taskList = $('.task-list');
+                        var taskTable = $('#task-table tbody');
+                        var taskRow = $('<tr>');
+                        taskRow.append($('<td>').text(newTask.name));
+                        taskRow.append($('<td>').text(newTask.datetime));
+                        taskRow.append($('<td>').text(newTask.assignee));
+                        taskTable.prepend(taskRow);
+                        $('#task_name').val('');
+                        $('#task_datetime').val('');
+                        $('#task_assignee').val('');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
