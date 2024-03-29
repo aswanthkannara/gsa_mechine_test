@@ -17,6 +17,8 @@ def login(request):
             print(email)
             password = form.cleaned_data.get('password')
             print(password)
+            a = Users.objects.filter(email=email,password=password)
+            print(a)
             if Users.objects.filter(email=email,password=password).exists():
                 # if user is not None:
                 # login(request, user)

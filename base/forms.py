@@ -10,7 +10,7 @@ class TaskForm(forms.ModelForm):
 class RegistrationForm(forms.ModelForm):
     class Meta:
         model = Users
-        fields = ['name', 'email', 'mobile_number', 'address']
+        fields = ['name', 'email', 'mobile_number', 'address','password']
 
 class CustomAuthenticationForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Enter your username'}))
